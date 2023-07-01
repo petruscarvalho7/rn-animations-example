@@ -1,4 +1,4 @@
 
 
-https://github.com/petruscarvalho7/rn-drawermenu-animated/assets/5557447/5b7105f2-acce-4584-8f05-d18249321d97
+https://github.com/petruscarvalho7/rn-animations-example/assets/5557447/56288b55-5043-409b-97fe-a908123acab6
 
