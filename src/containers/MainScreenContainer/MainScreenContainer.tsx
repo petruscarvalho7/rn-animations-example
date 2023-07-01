@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 // components
 import {
   SafeAreaView,
@@ -26,8 +26,18 @@ function MainScreenContainer(): JSX.Element {
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
 
+  // scroll
+  const scrollOffSet = useRef(new Animated.Value(0)).current;
+  const [offset, setOffSet] = useState(0);
+  const [titleWidth, setTitleWidth] = useState(0);
+
+  useEffect(() => {
+    scrollOffSet.addListener(({value}) => setOffSet(value));
+  }, [scrollOffSet]);
+
   return (
     <SafeAreaView style={styles.container}>
+      {/** Menu */}
       <View style={styles.viewMenu}>
         <Image
           source={theme.images.defaultProfilePicture}
@@ -65,13 +75,19 @@ function MainScreenContainer(): JSX.Element {
           })}
         </View>
       </View>
+      {/** MainView */}
       {MainDecoratorScreen({
         title: currentItem,
-        closeButtonOffset,
+        showMenu,
+        setShowMenu,
         offsetValue,
         scaleValue,
-        setShowMenu,
-        showMenu,
+        closeButtonOffset,
+        scrollOffSet,
+        offset,
+        setOffSet,
+        titleWidth,
+        setTitleWidth,
       })}
     </SafeAreaView>
   );

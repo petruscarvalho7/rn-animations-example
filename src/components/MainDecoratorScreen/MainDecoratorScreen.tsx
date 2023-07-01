@@ -5,6 +5,8 @@ import {
   Image,
   Text,
   StyleSheet,
+  View,
+  ScrollView,
 } from 'react-native';
 import theme from '../../util/theme';
 
@@ -15,9 +17,39 @@ type MainDecoratorScreenProps = PropsWithChildren<{
   offsetValue: any;
   scaleValue: any;
   closeButtonOffset: any;
+  scrollOffSet: Animated.Value;
+  offset: any;
+  setOffSet: (offSet: number) => void;
+  titleWidth: any;
+  setTitleWidth: (titleWidth: number) => void;
 }>;
 
 export const MainDecoratorScreen = (props: MainDecoratorScreenProps) => {
+  const onScroll = (e: {nativeEvent: {contentOffset: {y: number}}}) => {
+    const scrollSensitivity = 1;
+    const offsetValue = e.nativeEvent.contentOffset.y / scrollSensitivity;
+    props.scrollOffSet.setValue(-offsetValue);
+  };
+
+  // mock list
+  const getListItems = (count: number) => {
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      items.push(
+        <View
+          key={i.toString()}
+          style={[
+            styles.listItem,
+            {backgroundColor: i % 2 === 0 ? '#eee5ff' : '#ceebfd'},
+          ]}>
+          <Text style={{color: '#999'}}>{`Invoice ${i}`}</Text>
+        </View>,
+      );
+    }
+
+    return items;
+  };
+
   const durationValue: number = 300;
 
   const animationFlow = () => {
@@ -62,15 +94,86 @@ export const MainDecoratorScreen = (props: MainDecoratorScreenProps) => {
             },
           ],
         }}>
-        <TouchableOpacity onPress={animationFlow}>
-          <Image
-            source={
-              props.showMenu ? theme.images.closeIcon : theme.images.menuIcon
-            }
-            style={styles.menuIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.sectionText}>{props.title}</Text>
+        {/** Header */}
+        <Animated.View
+          style={{
+            zIndex: 2,
+            height: props.scrollOffSet.interpolate({
+              inputRange: [100, 200],
+              outputRange: [140, 220],
+              extrapolate: 'clamp',
+            }),
+            backgroundColor: theme.colors.redBackground,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            paddingHorizontal: 15 * theme.metrics.ratioX,
+            paddingTop: 20 * theme.metrics.ratioY,
+            borderBottomWidth: 1 * theme.metrics.ratioX,
+            borderBottomLeftRadius: 200 * theme.metrics.ratioX,
+            borderBottomRightRadius: 200 * theme.metrics.ratioX,
+          }}>
+          <TouchableOpacity
+            onPress={animationFlow}
+            style={{width: 60 * theme.metrics.ratioX, zIndex: 100}}>
+            <Image
+              source={
+                props.showMenu ? theme.images.closeIcon : theme.images.menuIcon
+              }
+              style={styles.menuIcon}
+            />
+          </TouchableOpacity>
+          <Animated.Text
+            style={[
+              styles.sectionText,
+              props.offset <= 1
+                ? {alignSelf: 'center'}
+                : {
+                    paddingLeft: props.scrollOffSet.interpolate({
+                      inputRange: [0, 200],
+                      outputRange: [130 * theme.metrics.ratioX, 0],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+              {
+                zIndex: 1,
+                fontSize: props.scrollOffSet.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [20, 30],
+                  extrapolate: 'clamp',
+                }),
+                marginTop: props.scrollOffSet.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [-20 * theme.metrics.ratioY, 20],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ]}
+            onLayout={e => {
+              if (props.offset === 0 && props.titleWidth === 0) {
+                const titleWidth = e.nativeEvent.layout.width;
+                props.setTitleWidth(titleWidth);
+              }
+            }}>
+            {props.title}
+          </Animated.Text>
+        </Animated.View>
+        {props.title === 'Invoices' && (
+          <ScrollView
+            style={{
+              zIndex: 1,
+              width: '100%',
+            }}
+            contentContainerStyle={{
+              marginTop: 120 * theme.metrics.ratioY,
+              width: '100%',
+            }}
+            onScroll={onScroll}
+            scrollEventThrottle={20}>
+            {getListItems(9)}
+          </ScrollView>
+        )}
       </Animated.View>
     </Animated.View>
   );
@@ -85,19 +188,21 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 15 * theme.metrics.ratioX,
-    paddingVertical: 20 * theme.metrics.ratioY,
   },
   menuIcon: {
     width: 20 * theme.metrics.ratioX,
     height: 20 * theme.metrics.ratioY,
-    tintColor: theme.colors.blackTwo,
+    tintColor: theme.colors.white2,
     marginTop: 30 * theme.metrics.ratioY,
   },
   sectionText: {
-    fontSize: 30 * theme.metrics.ratioX,
     fontWeight: 'bold',
-    color: theme.colors.blackTwo,
-    paddingTop: 20 * theme.metrics.ratioY,
+    color: theme.colors.white2,
+  },
+  listItem: {
+    height: 100,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
