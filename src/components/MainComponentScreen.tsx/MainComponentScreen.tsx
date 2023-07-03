@@ -24,7 +24,74 @@ type MainDecoratorScreenProps = PropsWithChildren<{
   setTitleWidth: (titleWidth: number) => void;
 }>;
 
-export const MainDecoratorScreen = (props: MainDecoratorScreenProps) => {
+function MainHeader(
+  props: MainDecoratorScreenProps,
+  animationFlow: () => void,
+) {
+  // styles props
+  const containerHeaderView = [
+    {
+      zIndex: 2,
+      height: props.scrollOffSet.interpolate({
+        inputRange: [100, 200],
+        outputRange: [140, 220],
+        extrapolate: 'clamp',
+      }),
+    },
+    styles.animatedContainerHeaderView,
+  ];
+  const headerTitleOffset =
+    props.offset <= 1
+      ? {alignSelf: 'center'}
+      : {
+          paddingLeft: props.scrollOffSet.interpolate({
+            inputRange: [0, 200],
+            outputRange: [130 * theme.metrics.ratioX, 0],
+            extrapolate: 'clamp',
+          }),
+        };
+  const headerTitle = [
+    styles.sectionText,
+    headerTitleOffset,
+    {
+      zIndex: 1,
+      fontSize: props.scrollOffSet.interpolate({
+        inputRange: [0, 100],
+        outputRange: [20, 30],
+        extrapolate: 'clamp',
+      }),
+      marginTop: props.scrollOffSet.interpolate({
+        inputRange: [0, 100],
+        outputRange: [-20 * theme.metrics.ratioY, 20],
+        extrapolate: 'clamp',
+      }),
+    },
+  ];
+  return (
+    <Animated.View style={containerHeaderView}>
+      <TouchableOpacity onPress={animationFlow} style={styles.menuButton}>
+        <Image
+          source={
+            props.showMenu ? theme.images.closeIcon : theme.images.menuIcon
+          }
+          style={styles.menuIcon}
+        />
+      </TouchableOpacity>
+      <Animated.Text
+        style={headerTitle}
+        onLayout={e => {
+          if (props.offset === 0 && props.titleWidth === 0) {
+            const titleWidth = e.nativeEvent.layout.width;
+            props.setTitleWidth(titleWidth);
+          }
+        }}>
+        {props.title}
+      </Animated.Text>
+    </Animated.View>
+  );
+}
+
+export const MainComponentScreen = (props: MainDecoratorScreenProps) => {
   const onScroll = (e: {nativeEvent: {contentOffset: {y: number}}}) => {
     const scrollSensitivity = 1;
     const offsetValue = e.nativeEvent.contentOffset.y / scrollSensitivity;
@@ -95,70 +162,7 @@ export const MainDecoratorScreen = (props: MainDecoratorScreenProps) => {
           ],
         }}>
         {/** Header */}
-        <Animated.View
-          style={{
-            zIndex: 2,
-            height: props.scrollOffSet.interpolate({
-              inputRange: [100, 200],
-              outputRange: [140, 220],
-              extrapolate: 'clamp',
-            }),
-            backgroundColor: theme.colors.redBackground,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            paddingHorizontal: 15 * theme.metrics.ratioX,
-            paddingTop: 20 * theme.metrics.ratioY,
-            borderBottomWidth: 1 * theme.metrics.ratioX,
-            borderBottomLeftRadius: 200 * theme.metrics.ratioX,
-            borderBottomRightRadius: 200 * theme.metrics.ratioX,
-          }}>
-          <TouchableOpacity
-            onPress={animationFlow}
-            style={{width: 60 * theme.metrics.ratioX, zIndex: 100}}>
-            <Image
-              source={
-                props.showMenu ? theme.images.closeIcon : theme.images.menuIcon
-              }
-              style={styles.menuIcon}
-            />
-          </TouchableOpacity>
-          <Animated.Text
-            style={[
-              styles.sectionText,
-              props.offset <= 1
-                ? {alignSelf: 'center'}
-                : {
-                    paddingLeft: props.scrollOffSet.interpolate({
-                      inputRange: [0, 200],
-                      outputRange: [130 * theme.metrics.ratioX, 0],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-              {
-                zIndex: 1,
-                fontSize: props.scrollOffSet.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [20, 30],
-                  extrapolate: 'clamp',
-                }),
-                marginTop: props.scrollOffSet.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [-20 * theme.metrics.ratioY, 20],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ]}
-            onLayout={e => {
-              if (props.offset === 0 && props.titleWidth === 0) {
-                const titleWidth = e.nativeEvent.layout.width;
-                props.setTitleWidth(titleWidth);
-              }
-            }}>
-            {props.title}
-          </Animated.Text>
-        </Animated.View>
+        {MainHeader(props, animationFlow)}
         {props.title === 'Invoices' && (
           <ScrollView
             style={{
@@ -205,4 +209,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  animatedContainerHeaderView: {
+    backgroundColor: theme.colors.redBackground,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 15 * theme.metrics.ratioX,
+    paddingTop: 20 * theme.metrics.ratioY,
+    borderBottomWidth: 1 * theme.metrics.ratioX,
+    borderBottomLeftRadius: 200 * theme.metrics.ratioX,
+    borderBottomRightRadius: 200 * theme.metrics.ratioX,
+  },
+  menuButton: {width: 60 * theme.metrics.ratioX, zIndex: 100},
 });

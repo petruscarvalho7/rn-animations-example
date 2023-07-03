@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import {TabMenuItem} from '../../components/TabMenuItem/TabMenuItem';
-import {MainDecoratorScreen} from '../../components/MainDecoratorScreen/MainDecoratorScreen';
+import {MainComponentScreen} from '../../components/MainComponentScreen.tsx/MainComponentScreen';
 
 // theme
 import theme from '../../util/theme';
@@ -76,7 +76,7 @@ function MainScreenContainer(): JSX.Element {
         </View>
       </View>
       {/** MainView */}
-      {MainDecoratorScreen({
+      {MainComponentScreen({
         title: currentItem,
         showMenu,
         setShowMenu,
