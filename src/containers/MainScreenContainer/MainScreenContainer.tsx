@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 
 import {TabMenuItem} from '../../components/TabMenuItem/TabMenuItem';
-import {MainComponentScreen} from '../../components/MainComponentScreen.tsx/MainComponentScreen';
+import {MainComponentScreen} from '../../components/MainComponentScreen/MainComponentScreen';
+import {DragDropComponent} from '../../components/DragDropComponent/DragDropComponent';
 
 // theme
 import theme from '../../util/theme';
@@ -89,6 +90,8 @@ function MainScreenContainer(): JSX.Element {
         titleWidth,
         setTitleWidth,
       })}
+      {/** DragDrop Component */}
+      {DragDropComponent()}
     </SafeAreaView>
   );
 }
