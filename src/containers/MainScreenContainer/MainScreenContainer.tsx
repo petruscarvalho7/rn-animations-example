@@ -34,6 +34,11 @@ function MainScreenContainer(): JSX.Element {
 
   useEffect(() => {
     scrollOffSet.addListener(({value}) => setOffSet(value));
+
+    // unmount
+    return () => {
+      scrollOffSet.removeListener(({value}) => setOffSet(value));
+    }
   }, [scrollOffSet]);
 
   return (
